@@ -1,0 +1,5 @@
+[INFO] 2024-10-31T12:48:37.414Z: from lambda one, now LambdaOne AverageTimeToCompleteExecution is:0
+[INFO] 2024-10-31T12:48:39.798Z: from lambda two, now LambdaTwo AverageTimeToCompleteExecution is:0
+[INFO] 2024-10-31T12:48:41.062Z: from lambda one, now LambdaOne AverageTimeToCompleteExecution is:5
+[INFO] 2024-10-31T12:48:42.379Z: from lambda two, now LambdaTwo AverageTimeToCompleteExecution is:5
+[INFO] 2024-10-31T12:48:43.617Z: from lambda one, now LambdaOne AverageTimeToCompleteExecution is:5
