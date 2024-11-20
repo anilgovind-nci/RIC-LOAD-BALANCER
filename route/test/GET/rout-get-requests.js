@@ -1,62 +1,101 @@
-const Config = require("serverless/lib/classes/config");
-const { lambdaAverageColdStartTime, lambdaAverageExecutionTime } = require('./config');
 const { logError, logInfo } = require('./logger');
 
-const globalState = {
-    LambdaOne: {
-        targetLambda: "lambda1",
-        AverageTimeToCompleteExecution: 0,
-        isActive: true, 
-    },
-    LambdaTwo: {
-        targetLambda: "lambda2",
-        AverageTimeToCompleteExecution: 0,
-        isActive: true, 
-    },
-};
+let Lambdas;
+let lambdaAverageExecutionTime;
+let getLambdaDetailskey = "getLambdaDetailskey";
 
+async function getRouter(req, res) {
+  try {
+    const redisHandler = req.redisHandler;
 
-function getRouter(req, res) {
-    const activeLambdas = Object.entries(globalState)
-    .filter(([key, value]) => value.isActive);
+    // Wait for Redis to return the data
+    const redisResponse = await redisHandler.read(getLambdaDetailskey);
+    Lambdas = redisResponse.ActiveLambdas;
+    lambdaAverageExecutionTime = redisResponse.lambdaAverageExecutionTime;
 
-    const [minLambdaKey, minLambdaValue] = activeLambdas.reduce((min, current) => {
-    const [, currentValue] = current;
-    return currentValue.AverageTimeToCompleteExecution < min[1].AverageTimeToCompleteExecution
-        ? current
-        : min;
-    });
-    if (minLambdaValue.targetLambda==="lambda1"){
-        return warm_lambda_one(req, res, minLambdaValue.AverageTimeToCompleteExecution);
+    // Ensure that Lambdas data exists and is in the expected format
+    if (!Lambdas) {
+      return res.status(404).json({ error: "Lambda details not found." });
     }
-    if (minLambdaValue.targetLambda==="lambda2"){
-        return warm_lambda_two(req, res, minLambdaValue.AverageTimeToCompleteExecution);
+
+    // Filter the active Lambdas
+    const activeLambdas = Object.entries(Lambdas).filter(([key, value]) => value.isActive);
+
+    // If no active lambdas are found
+    if (activeLambdas.length === 0) {
+      return res.status(404).json({ error: "No active Lambdas found." });
     }
-    else return warm_lambda_one(req, res, minLambdaValue.AverageTimeToCompleteExecution);
+
+    // Find the lambda with the minimum AverageTimeToCompleteExecution
+    const [minLambdaKey, minLambdaValue] = activeLambdas.reduce(
+      (min, current) => {
+        const [, currentValue] = current;
+        const [, minValue] = min;
+        return currentValue.AverageTimeToCompleteExecution < minValue.AverageTimeToCompleteExecution
+          ? current
+          : min;
+      },
+      activeLambdas[0] // Set the initial value for reduce
+    );
+
+    // Set a timeout before invoking the lambda based on AverageTimeToCompleteExecution
+    // const timeoutForLambdaCall = minLambdaValue.AverageTimeToCompleteExecution*1000;
+    // console.log("timeoutForLambdaCall",minLambdaKey, timeoutForLambdaCall);
+    // setTimeout(() => {
+      return invoke_warm_lambda(req, res, minLambdaKey, minLambdaValue);
+    // }, timeoutForLambdaCall);
+
+  } catch (error) {
+    console.error("Error in getRouter:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
 }
 
-function warm_lambda_one(req, res, averageTime) {
-    globalState.LambdaOne.AverageTimeToCompleteExecution += lambdaAverageExecutionTime;
+async function invoke_warm_lambda(req, res, minLambdaKey, minLambdaValue) {
+  try {
+    // Increment the AverageTimeToCompleteExecution for the selected Lambda
+    await req.redisHandler.update(getLambdaDetailskey, minLambdaKey, lambdaAverageExecutionTime);
 
-    setTimeout(() => {
-        logInfo("from lambda one, now LambdaOne AverageTimeToCompleteExecution is:"+
-            averageTime);
-        res.send("message from warm lambda one");
-
-        globalState.LambdaOne.AverageTimeToCompleteExecution -= lambdaAverageExecutionTime;
-    }, 5000); 
+    logInfo(
+      `From Lambda ${minLambdaKey}, AverageTimeToCompleteExecution incremented by: ${lambdaAverageExecutionTime}
+      and current AverageTimeToCompleteExecution is: ${minLambdaValue.AverageTimeToCompleteExecution + lambdaAverageExecutionTime}`
+    );
+    
+    // Set a dynamic timeout based on the lambda's AverageTimeToCompleteExecution (converted to milliseconds)
+    const timeoutForExecution = minLambdaValue.AverageTimeToCompleteExecution * 1000;  // Convert to milliseconds
+    console.log("timeoutForExecution",timeoutForExecution)
+    
+    // Simulate Lambda execution with a delay based on the calculated timeout
+    setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey), timeoutForExecution);
+  } catch (error) {
+    console.error("Error in invoke_warm_lambda:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
 }
 
-function warm_lambda_two(req, res, averageTime) {
-    globalState.LambdaTwo.AverageTimeToCompleteExecution += lambdaAverageExecutionTime;
 
-    setTimeout(() => {
-        logInfo("from lambda two, now LambdaTwo AverageTimeToCompleteExecution is:"+
-            averageTime);       
-        res.send("message from warm lambda two");
+// New function to handle the delayed execution logic
+async function decrementExecutionTimeAndRespond(req, res, minLambdaKey) {
+  try {
+    // Wait for 4 seconds before continuing with the logic
+    await new Promise(resolve => setTimeout(resolve, 4000)); // 4000 ms = 4 seconds
 
-        globalState.LambdaTwo.AverageTimeToCompleteExecution -= lambdaAverageExecutionTime;
-    }, 5000); 
+    // Decrement the AverageTimeToCompleteExecution after execution
+    const currentData = await req.redisHandler.update(getLambdaDetailskey, minLambdaKey, -lambdaAverageExecutionTime);
+    const currentAverageTimeToCompleteExecution = currentData.ActiveLambdas[minLambdaKey].AverageTimeToCompleteExecution;
+
+    logInfo(
+      `Execution completed for Lambda ${minLambdaKey}. Decremented AverageTimeToCompleteExecution by: ${lambdaAverageExecutionTime}
+      and current AverageTimeToCompleteExecution is: ${currentAverageTimeToCompleteExecution}`
+    );
+
+    // Send the final response back to the client
+    res.send(`Execution completed for warm ${minLambdaKey}.`);
+  } catch (timeoutError) {
+    console.error("Error during delayed execution:", timeoutError);
+    res.status(500).json({ error: "Error during delayed execution." });
+  }
 }
+
 
 module.exports = getRouter;
