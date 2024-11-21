@@ -1,76 +1,24 @@
-[INFO] 2024-11-20T18:52:30.444Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:31.398Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:33.098Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:52:33.985Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:52:34.450Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:34.930Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:52:35.403Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:36.380Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:52:37.894Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:52:41.104Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:52:41.988Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:42.523Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:52:42.961Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:44.387Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:52:49.911Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
+[INFO] 2024-11-21T00:17:12.142Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 1
+      and current AverageTimeToCompleteExecution is: 1
+[INFO] 2024-11-21T00:17:14.065Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 1
+      and current AverageTimeToCompleteExecution is: 2
+[INFO] 2024-11-21T00:17:18.420Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 1
+      and current AverageTimeToCompleteExecution is: 1
+[INFO] 2024-11-21T00:17:18.547Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 1
       and current AverageTimeToCompleteExecution is: 0
-[INFO] 2024-11-20T18:52:50.655Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 0
-[INFO] 2024-11-20T18:54:41.515Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
+[INFO] 2024-11-21T00:20:19.505Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 1
+      and current AverageTimeToCompleteExecution is: 1
+[INFO] 2024-11-21T00:20:21.774Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 1
+      and current AverageTimeToCompleteExecution is: 2
+[INFO] 2024-11-21T00:20:24.236Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 1
+      and current AverageTimeToCompleteExecution is: 3
+[INFO] 2024-11-21T00:20:26.066Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 1
       and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:54:42.490Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:54:43.430Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:54:44.378Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:54:45.314Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:54:45.526Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:54:46.242Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:54:46.494Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:54:47.118Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:54:48.134Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:54:48.934Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 16
-[INFO] 2024-11-20T18:54:49.903Z: From Lambda LambdaTwo, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 16
-[INFO] 2024-11-20T18:54:51.434Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:54:52.382Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:54:52.537Z: From Lambda LambdaOne, AverageTimeToCompleteExecution incremented by: 4
-      and current AverageTimeToCompleteExecution is: 16
-[INFO] 2024-11-20T18:54:55.122Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:54:57.320Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 12
-[INFO] 2024-11-20T18:54:58.245Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 8
-[INFO] 2024-11-20T18:55:00.144Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:55:04.958Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 4
-[INFO] 2024-11-20T18:55:05.917Z: Execution completed for Lambda LambdaTwo. Decremented AverageTimeToCompleteExecution by: 4
-      and current AverageTimeToCompleteExecution is: 0
-[INFO] 2024-11-20T18:55:08.543Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 4
+[INFO] 2024-11-21T00:20:26.290Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 1
+      and current AverageTimeToCompleteExecution is: 3
+[INFO] 2024-11-21T00:20:26.456Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 1
+      and current AverageTimeToCompleteExecution is: 2
+[INFO] 2024-11-21T00:20:26.691Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 1
+      and current AverageTimeToCompleteExecution is: 1
+[INFO] 2024-11-21T00:20:29.123Z: Execution completed for Lambda LambdaOne. Decremented AverageTimeToCompleteExecution by: 1
       and current AverageTimeToCompleteExecution is: 0

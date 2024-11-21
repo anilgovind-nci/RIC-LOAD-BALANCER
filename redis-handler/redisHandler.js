@@ -132,18 +132,18 @@ async function initializeRedisHandler() {
 //     const storeData = {
 //       ActiveLambdas: {
 //           LambdaOne: {
-//               targetLambda: "lambda1",
+//               targetLambda: "ric-crud-application-dev-ricGet",
 //               AverageTimeToCompleteExecution: 0,
 //               isActive: true, 
 //           },
 //           LambdaTwo: {
-//               targetLambda: "lambda2",
+//               targetLambda: "ric-crud-application-dev-ricGet-6d888bfd-5f2f-4cb2-9fcb-6acbb842",
 //               AverageTimeToCompleteExecution: 0,
-//               isActive: true, 
+//               isActive: false, 
 //           },
 //       },
 //       lambdaAverageColdStartTime: 20,
-//       lambdaAverageExecutionTime: 4
+//       lambdaAverageExecutionTime: 1
 //   }
 //   const storeUpdatedData = {
 //     ActiveLambdas: {

@@ -1,8 +1,10 @@
 const { logError, logInfo } = require('./logger');
+const { invokeLambdaFunctionWithQueryParams } = require('../../../lambda/lambdaInvocation.js'); // Adjust the path as necessary
 
 let Lambdas;
 let lambdaAverageExecutionTime;
 let getLambdaDetailskey = "getLambdaDetailskey";
+let decrementLock = false;
 
 async function getRouter(req, res) {
   try {
@@ -73,13 +75,23 @@ async function invoke_warm_lambda(req, res, minLambdaKey, minLambdaValue) {
   }
 }
 
-
-// New function to handle the delayed execution logic
 async function decrementExecutionTimeAndRespond(req, res, minLambdaKey) {
   try {
-    // Wait for 4 seconds before continuing with the logic
-    await new Promise(resolve => setTimeout(resolve, 4000)); // 4000 ms = 4 seconds
+    if (decrementLock) {
+      console.log('Another request is being processed. Waiting...');
+      return setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey), 400); // Retry after 100ms
+    }
+    decrementLock = true;
+    // Invoke the Lambda function and wait for its response
+    const id = "75"; // Replace or adjust based on your use case
+    const pps = "999"; // Replace or adjust based on your use case
+    const functionName = "ric-crud-application-dev-ricGet"; // Replace with your Lambda function name
 
+    console.log(`Invoking Lambda ${functionName} with query parameters id=${id}, pps=${pps}`);
+    
+    const lambdaResponse = await invokeLambdaFunctionWithQueryParams(functionName, id, pps);
+
+    console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
     // Decrement the AverageTimeToCompleteExecution after execution
     const currentData = await req.redisHandler.update(getLambdaDetailskey, minLambdaKey, -lambdaAverageExecutionTime);
     const currentAverageTimeToCompleteExecution = currentData.ActiveLambdas[minLambdaKey].AverageTimeToCompleteExecution;
@@ -90,12 +102,14 @@ async function decrementExecutionTimeAndRespond(req, res, minLambdaKey) {
     );
 
     // Send the final response back to the client
-    res.send(`Execution completed for warm ${minLambdaKey}.`);
-  } catch (timeoutError) {
-    console.error("Error during delayed execution:", timeoutError);
-    res.status(500).json({ error: "Error during delayed execution." });
+    res.send(lambdaResponse);
+    decrementLock = false;
+  } catch (error) {
+    console.error("Error during execution:", error);
+    res.status(500).json({ error: "Error during execution." });
   }
 }
+
 
 
 module.exports = getRouter;
