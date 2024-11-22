@@ -1,52 +1,27 @@
 const { logError, logInfo } = require('./logger');
 const { invokeLambdaFunctionWithQueryParams } = require('../../../lambda/lambdaInvocation.js'); // Adjust the path as necessary
+const { getLambdaWithMinExecutionTime } = require('../../helpers/fetchMinLambda.js');
+const { validateRedisResponseAndReturnActiveLambdas } = require('../../helpers/validateRedisResponseAndReturnActiveLambdas.js')
 
-let Lambdas;
+// let Lambdas;
 let lambdaAverageExecutionTime;
 let getLambdaDetailskey = "getLambdaDetailskey";
 let engagedLambdas = [];
 
+
+// Main function
 async function getRouter(req, res) {
   try {
     const redisHandler = req.redisHandler;
-
-    // Wait for Redis to return the data
     const redisResponse = await redisHandler.read(getLambdaDetailskey);
-    Lambdas = redisResponse.ActiveLambdas;
+    const validatedResponse = validateRedisResponseAndReturnActiveLambdas(redisResponse);
+    if (validatedResponse.error) {
+      return res.status(validatedResponse.error.status).json({ error: validatedResponse.error.message });
+    }
+    const activeLambdas = validatedResponse;
     lambdaAverageExecutionTime = redisResponse.lambdaAverageExecutionTime;
-
-    // Ensure that Lambdas data exists and is in the expected format
-    if (!Lambdas) {
-      return res.status(404).json({ error: "Lambda details not found." });
-    }
-
-    // Filter the active Lambdas
-    const activeLambdas = Object.entries(Lambdas).filter(([key, value]) => value.isActive);
-
-    // If no active lambdas are found
-    if (activeLambdas.length === 0) {
-      return res.status(404).json({ error: "No active Lambdas found." });
-    }
-
-    // Find the lambda with the minimum AverageTimeToCompleteExecution
-    const [minLambdaKey, minLambdaValue] = activeLambdas.reduce(
-      (min, current) => {
-        const [, currentValue] = current;
-        const [, minValue] = min;
-        return currentValue.AverageTimeToCompleteExecution < minValue.AverageTimeToCompleteExecution
-          ? current
-          : min;
-      },
-      activeLambdas[0] // Set the initial value for reduce
-    );
-
-    // Set a timeout before invoking the lambda based on AverageTimeToCompleteExecution
-    // const timeoutForLambdaCall = minLambdaValue.AverageTimeToCompleteExecution*1000;
-    // console.log("timeoutForLambdaCall",minLambdaKey, timeoutForLambdaCall);
-    // setTimeout(() => {
-      return invoke_warm_lambda(req, res, minLambdaKey, minLambdaValue);
-    // }, timeoutForLambdaCall);
-
+    const [minLambdaKey, minLambdaValue] = getLambdaWithMinExecutionTime(activeLambdas);
+    return invoke_warm_lambda(req, res, minLambdaKey, minLambdaValue);
   } catch (error) {
     console.error("Error in getRouter:", error);
     res.status(500).json({ error: "Internal server error." });
@@ -90,11 +65,6 @@ async function decrementExecutionTimeAndRespond(req, res, minLambdaKey, targetLa
       return setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey, targetLambda), 10); // Retry after 10ms
     }
     engagedLambdas.push(minLambdaKey);
-    // const id = "75"; // Replace or adjust based on your use case
-    // const pps = "999"; // Replace or adjust based on your use case
-
-    // console.log(`Invoking Lambda ${targetLambda} with query parameters id=${id}, pps=${pps}`);
-    
     const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query);
 
     console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
