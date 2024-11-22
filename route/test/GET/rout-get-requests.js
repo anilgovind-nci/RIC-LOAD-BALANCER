@@ -4,7 +4,7 @@ const { invokeLambdaFunctionWithQueryParams } = require('../../../lambda/lambdaI
 let Lambdas;
 let lambdaAverageExecutionTime;
 let getLambdaDetailskey = "getLambdaDetailskey";
-let decrementLock = false;
+let engagedLambdas = [];
 
 async function getRouter(req, res) {
   try {
@@ -64,38 +64,44 @@ async function invoke_warm_lambda(req, res, minLambdaKey, minLambdaValue) {
     );
     
     // Set a dynamic timeout based on the lambda's AverageTimeToCompleteExecution (converted to milliseconds)
-    const timeoutForExecution = minLambdaValue.AverageTimeToCompleteExecution * 1000;  // Convert to milliseconds
+    const timeoutForExecution = minLambdaValue.AverageTimeToCompleteExecution;  // Convert to milliseconds
     console.log("timeoutForExecution",timeoutForExecution)
-    
+    let targetLambda = minLambdaValue.targetLambda;
     // Simulate Lambda execution with a delay based on the calculated timeout
-    setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey), timeoutForExecution);
+
+
+    // setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey,targetLambda), timeoutForExecution);
+    decrementExecutionTimeAndRespond(req, res, minLambdaKey,targetLambda)
+
   } catch (error) {
     console.error("Error in invoke_warm_lambda:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 }
 
-async function decrementExecutionTimeAndRespond(req, res, minLambdaKey) {
+async function decrementExecutionTimeAndRespond(req, res, minLambdaKey, targetLambda) {
   try {
-    if (decrementLock) {
-      console.log('Another request is being processed. Waiting...');
-      return setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey), 400); // Retry after 100ms
-    }
-    decrementLock = true;
-    // Invoke the Lambda function and wait for its response
-    const id = "75"; // Replace or adjust based on your use case
-    const pps = "999"; // Replace or adjust based on your use case
-    const functionName = "ric-crud-application-dev-ricGet"; // Replace with your Lambda function name
+    // Log the request query parameters and body
+    console.log("Request Query Params:", req.query);
+    // console.log("Request:", req);
 
-    console.log(`Invoking Lambda ${functionName} with query parameters id=${id}, pps=${pps}`);
+    if (engagedLambdas.includes(minLambdaKey)) {
+      console.log('Another request is being processed. Waiting...');
+      return setTimeout(() => decrementExecutionTimeAndRespond(req, res, minLambdaKey, targetLambda), 10); // Retry after 10ms
+    }
+    engagedLambdas.push(minLambdaKey);
+    // const id = "75"; // Replace or adjust based on your use case
+    // const pps = "999"; // Replace or adjust based on your use case
+
+    // console.log(`Invoking Lambda ${targetLambda} with query parameters id=${id}, pps=${pps}`);
     
-    const lambdaResponse = await invokeLambdaFunctionWithQueryParams(functionName, id, pps);
+    const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query);
 
     console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
     // Decrement the AverageTimeToCompleteExecution after execution
     const currentData = await req.redisHandler.update(getLambdaDetailskey, minLambdaKey, -lambdaAverageExecutionTime);
     const currentAverageTimeToCompleteExecution = currentData.ActiveLambdas[minLambdaKey].AverageTimeToCompleteExecution;
-
+    engagedLambdas = engagedLambdas.filter(item => item !== minLambdaKey);
     logInfo(
       `Execution completed for Lambda ${minLambdaKey}. Decremented AverageTimeToCompleteExecution by: ${lambdaAverageExecutionTime}
       and current AverageTimeToCompleteExecution is: ${currentAverageTimeToCompleteExecution}`
@@ -103,12 +109,12 @@ async function decrementExecutionTimeAndRespond(req, res, minLambdaKey) {
 
     // Send the final response back to the client
     res.send(lambdaResponse);
-    decrementLock = false;
   } catch (error) {
     console.error("Error during execution:", error);
     res.status(500).json({ error: "Error during execution." });
   }
 }
+
 
 
 

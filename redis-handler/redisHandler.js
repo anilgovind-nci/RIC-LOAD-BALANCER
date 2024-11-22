@@ -139,11 +139,11 @@ async function initializeRedisHandler() {
 //           LambdaTwo: {
 //               targetLambda: "ric-crud-application-dev-ricGet-6d888bfd-5f2f-4cb2-9fcb-6acbb842",
 //               AverageTimeToCompleteExecution: 0,
-//               isActive: false, 
+//               isActive: true, 
 //           },
 //       },
 //       lambdaAverageColdStartTime: 20,
-//       lambdaAverageExecutionTime: 1
+//       lambdaAverageExecutionTime: 150
 //   }
 //   const storeUpdatedData = {
 //     ActiveLambdas: {
