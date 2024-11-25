@@ -1,4 +1,4 @@
-const { logError, logInfo } = require('./logger');
+const { logError, logInfo } = require('../log/logger.js');
 const { invokeLambdaFunctionWithQueryParams } = require('../../../lambda/lambdaInvocation.js'); // Adjust the path as necessary
 const { getLambdaWithMinExecutionTime } = require('../../helpers/fetchMinLambda.js');
 const { validateRedisResponseAndReturnActiveLambdas } = require('../../helpers/validateRedisResponseAndReturnActiveLambdas.js')

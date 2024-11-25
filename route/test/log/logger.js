@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logFilePath = path.join(__dirname, 'log/app.log');
+const logFilePath = path.join(__dirname, './app.log');
 
 function logInfo(message) {
     const logMessage = `[INFO] ${new Date().toISOString()}: ${message}\n`;
