@@ -2,10 +2,14 @@ const { logError, logInfo } = require('./logger');
 const { invokeLambdaFunctionWithQueryParams } = require('../../../lambda/lambdaInvocation.js'); // Adjust the path as necessary
 const { getLambdaWithMinExecutionTime } = require('../../helpers/fetchMinLambda.js');
 const { validateRedisResponseAndReturnActiveLambdas } = require('../../helpers/validateRedisResponseAndReturnActiveLambdas.js')
+const { lambdaNode } = require('./config.js')
 
 // let Lambdas;
+let firstRequest = true
 let lambdaAverageExecutionTime;
-let getFunctionResourcesRediskey = "getLambdaDetailskey";
+// let getFunctionResourcesRediskey = "getLambdaDetailskey";
+const keyForSecretManagerRedisFunctionKey = "getFunctionResourcesRediskey";
+let getFunctionResourcesRediskey
 let engagedLambdas = [];
 
 
@@ -13,6 +17,12 @@ let engagedLambdas = [];
 async function getRouter(req, res) {
   try {
     const redisHandler = req.redisHandler;
+    getFunctionResourcesRediskey = redisHandler.RedisSecretDetails[keyForSecretManagerRedisFunctionKey]
+    if(firstRequest){
+      const newLambdaNodeKey = await redisHandler.addLambdaNode(getFunctionResourcesRediskey, lambdaNode)
+      redisHandler.removeLambdaNode(getFunctionResourcesRediskey, newLambdaNodeKey, lambdaNode)
+      firstRequest = false
+    }
     const redisResponse = await redisHandler.read(getFunctionResourcesRediskey);
     const validatedResponse = validateRedisResponseAndReturnActiveLambdas(redisResponse);
     if (validatedResponse.error) {
@@ -21,7 +31,10 @@ async function getRouter(req, res) {
     const activeLambdas = validatedResponse;
     lambdaAverageExecutionTime = redisResponse.lambdaAverageExecutionTime;
     const [minLambdaKey, minLambdaValue] = getLambdaWithMinExecutionTime(activeLambdas);
-    return invokeWarmLambdaAndIncrementRedis(req, res, minLambdaKey, minLambdaValue);
+    if((minLambdaValue.AverageTimeToCompleteExecution+lambdaAverageExecutionTime) > redisResponse.lambdaAverageColdStartTime){
+      return callLambdaDirectAndUpdateRedis(req, res, minLambdaValue)
+    }
+    else return invokeWarmLambdaAndIncrementRedis(req, res, minLambdaKey, minLambdaValue);
   } catch (error) {
     console.error("Error in getRouter:", error);
     res.status(500).json({ error: "Internal server error." });
@@ -36,7 +49,7 @@ async function invokeWarmLambdaAndIncrementRedis(req, res, minLambdaKey, minLamb
       `From Lambda ${minLambdaKey}, AverageTimeToCompleteExecution incremented by: ${lambdaAverageExecutionTime}
       and current AverageTimeToCompleteExecution is: ${minLambdaValue.AverageTimeToCompleteExecution + lambdaAverageExecutionTime}`
     );
-    let targetLambda = minLambdaValue.targetLambda;
+    const targetLambda = minLambdaValue.targetLambda;
     invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey,targetLambda)
   } catch (error) {
     console.error("Error in invokeWarmLambdaAndIncrementRedis:", error);
@@ -66,5 +79,14 @@ async function invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey, targetL
     console.error("Error during execution:", error);
     res.status(500).json({ error: "Error during execution." });
   }
+}
+
+async function callLambdaDirectAndUpdateRedis(req, res, minLambdaValue){
+  const targetLambda = minLambdaValue.targetLambda;
+  const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query);
+  console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
+  const newLambdaNodeKey = await req.redisHandler.addLambdaNode(getFunctionResourcesRediskey, lambdaNode)
+  req.redisHandler.removeLambdaNode(getFunctionResourcesRediskey, newLambdaNodeKey, lambdaNode)
+  res.send(lambdaResponse);
 }
 module.exports = getRouter;

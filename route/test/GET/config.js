@@ -1,8 +1,10 @@
-const lambdaAverageColdStartTime = 15
-const lambdaAverageExecutionTime = 5
+const lambdaNode = {
+  targetLambda: "ric-crud-application-dev-ricGet",
+  AverageTimeToCompleteExecution: 0,
+  isActive: true,
+}
 
 
 module.exports = {
-    lambdaAverageColdStartTime,
-    lambdaAverageExecutionTime
+  lambdaNode
   };
