@@ -209,7 +209,7 @@ async function initializeRedisHandler() {
 //       lambdaAverageColdStartTime: 50,
 //       lambdaAverageExecutionTime: 10
 //     }
-//     const getLambdaDetailskey = "getLambdaDetailskey"
+//     const getLambdaDetailskey = "deleteLambdaDetailskey"
 //     const redisHandler = await initializeRedisHandler();
 //     // await redisHandler.create(getLambdaDetailskey,storeData)
 //     await redisHandler.create(getLambdaDetailskey,storeUpdatedData);
