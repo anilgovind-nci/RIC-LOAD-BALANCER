@@ -4,7 +4,7 @@ const port = 3000;
 
 // Import routes
 const homeRoute = require("./route/route-root");
-const testRoute = require("./route/test/route-to-warm-lambda");
+const ricRoute = require("./route/ric/route-to-warm-lambda");
 const { initializeRedisHandler } = require("./redis-handler/redisHandler"); // Import your redis handler
 
 async function startApp() {
@@ -21,7 +21,7 @@ async function startApp() {
 
     // Use routes
     app.use("/", homeRoute);  // For root route
-    app.use("/test", testRoute);  // For /test route
+    app.use("/ric", ricRoute);  // For /ric route
 
     // Start the server
     app.listen(port, () => {

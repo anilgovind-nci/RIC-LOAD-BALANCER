@@ -33,6 +33,21 @@ class StateManager {
     redisKey: '',
     secretManagerKey: 'getFunctionResourcesRediskey'
   });
+  const putRouterState = new StateManager({
+    firstRequest: true,
+    lambdaAverageExecutionTime: 0,
+    engagedLambdas: [],
+    redisKey: '',
+    secretManagerKey: 'putFunctionResourcesRediskey'
+  });
+
+  const deleteRouterState = new StateManager({
+    firstRequest: true,
+    lambdaAverageExecutionTime: 0,
+    engagedLambdas: [],
+    redisKey: '',
+    secretManagerKey: 'deleteFunctionResourcesRediskey'
+  });
   
-  module.exports = { postRouterState, getRouterState };
+  module.exports = { postRouterState, getRouterState, putRouterState, deleteRouterState };
   
