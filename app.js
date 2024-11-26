@@ -17,6 +17,7 @@ async function startApp() {
       req.redisHandler = redisHandler;  // Attach redisHandler to the request object
       next();  // Move on to the next middleware or route handler
     });
+    app.use(express.json());
 
     // Use routes
     app.use("/", homeRoute);  // For root route

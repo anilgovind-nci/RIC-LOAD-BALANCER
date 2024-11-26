@@ -4,12 +4,13 @@ const { LambdaClient, InvokeCommand } = require("@aws-sdk/client-lambda");
 const lambdaClient = new LambdaClient({ region: "eu-west-1" }); // Replace with your AWS region
 
 // Function to invoke the Lambda with query parameters
-async function invokeLambdaFunctionWithQueryParams(functionName, queryParameters) {
+async function invokeLambdaFunctionWithQueryParams(functionName, queryParameters, requestBody) {
   const params = {
     FunctionName: functionName, // Replace with the actual Lambda function name
     InvocationType: "RequestResponse", // Synchronous invocation to get a response
     Payload: JSON.stringify({
-      queryStringParameters: queryParameters
+      queryStringParameters: queryParameters,
+      body: JSON.stringify(requestBody)
     }),
   };
 

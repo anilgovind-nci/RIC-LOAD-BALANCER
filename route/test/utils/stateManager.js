@@ -22,14 +22,16 @@ class StateManager {
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
     engagedLambdas: [],
-    redisKey: 'postFunctionResourcesRediskey'
+    redisKey: '',
+    secretManagerKey: 'postFunctionResourcesRediskey'
   });
   
   const getRouterState = new StateManager({
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
     engagedLambdas: [],
-    redisKey: 'getFunctionResourcesRediskey'
+    redisKey: '',
+    secretManagerKey: 'getFunctionResourcesRediskey'
   });
   
   module.exports = { postRouterState, getRouterState };

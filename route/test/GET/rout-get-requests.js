@@ -64,7 +64,7 @@ async function invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey, targetL
       return setTimeout(() => invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey, targetLambda), 10); // Retry after 10ms
     }
     engagedLambdas.push(minLambdaKey);
-    const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query);
+    const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query, req.body);
     console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
     // Decrement the AverageTimeToCompleteExecution after execution
     const currentData = await req.redisHandler.update(getFunctionResourcesRediskey, minLambdaKey, -lambdaAverageExecutionTime);
@@ -83,7 +83,7 @@ async function invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey, targetL
 
 async function callLambdaDirectAndUpdateRedis(req, res, minLambdaValue){
   const targetLambda = minLambdaValue.targetLambda;
-  const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query);
+  const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query, req.body);
   console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
   const newLambdaNodeKey = await req.redisHandler.addLambdaNode(getFunctionResourcesRediskey, lambdaNode)
   req.redisHandler.removeLambdaNode(getFunctionResourcesRediskey, newLambdaNodeKey, lambdaNode)
