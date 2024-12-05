@@ -31,10 +31,14 @@ async function getRouter(req, res) {
     const activeLambdas = validatedResponse;
     lambdaAverageExecutionTime = redisResponse.lambdaAverageExecutionTime;
     const [minLambdaKey, minLambdaValue] = getLambdaWithMinExecutionTime(activeLambdas);
-    if((minLambdaValue.AverageTimeToCompleteExecution+lambdaAverageExecutionTime) > redisResponse.lambdaAverageColdStartTime){
+    if((minLambdaValue.AverageTimeToCompleteExecution+lambdaAverageExecutionTime) >= redisResponse.lambdaAverageColdStartTime){
+      console.log("inside if block")
       return callLambdaDirectAndUpdateRedis(req, res, minLambdaValue)
     }
-    else return invokeWarmLambdaAndIncrementRedis(req, res, minLambdaKey, minLambdaValue);
+    else {
+      console.log("outside if block")
+      return invokeWarmLambdaAndIncrementRedis(req, res, minLambdaKey, minLambdaValue);
+    }
   } catch (error) {
     console.error("Error in getRouter:", error);
     res.status(500).json({ error: "Internal server error." });
@@ -60,7 +64,7 @@ async function invokeWarmLambdaAndIncrementRedis(req, res, minLambdaKey, minLamb
 async function invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey, targetLambda) {
   try {
     if (engagedLambdas.includes(minLambdaKey)) {
-      console.log('Another request is being processed. Waiting...');
+      // console.log('Another request is being processed. Waiting...');
       return setTimeout(() => invokeWarmLambdaAndDecrementRedis(req, res, minLambdaKey, targetLambda), 10); // Retry after 10ms
     }
     engagedLambdas.push(minLambdaKey);

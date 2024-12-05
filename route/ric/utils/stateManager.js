@@ -23,7 +23,8 @@ class StateManager {
     lambdaAverageExecutionTime: 0,
     engagedLambdas: [],
     redisKey: '',
-    secretManagerKey: 'postFunctionResourcesRediskey'
+    secretManagerKey: 'postFunctionResourcesRediskey',
+    lockRead:false,
   });
   
   const getRouterState = new StateManager({
@@ -31,14 +32,16 @@ class StateManager {
     lambdaAverageExecutionTime: 0,
     engagedLambdas: [],
     redisKey: '',
-    secretManagerKey: 'getFunctionResourcesRediskey'
+    secretManagerKey: 'getFunctionResourcesRediskey',
+    lockRead:false,
   });
   const putRouterState = new StateManager({
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
     engagedLambdas: [],
     redisKey: '',
-    secretManagerKey: 'putFunctionResourcesRediskey'
+    secretManagerKey: 'putFunctionResourcesRediskey',
+    lockRead:false,
   });
 
   const deleteRouterState = new StateManager({
@@ -46,7 +49,8 @@ class StateManager {
     lambdaAverageExecutionTime: 0,
     engagedLambdas: [],
     redisKey: '',
-    secretManagerKey: 'deleteFunctionResourcesRediskey'
+    secretManagerKey: 'deleteFunctionResourcesRediskey',
+    lockRead:false,
   });
   
   module.exports = { postRouterState, getRouterState, putRouterState, deleteRouterState };

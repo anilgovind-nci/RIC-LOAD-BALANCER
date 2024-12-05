@@ -20,7 +20,7 @@ async function invokeWarmLambdaAndDecrementRedis(req, res, lambdaKey, targetLamb
   const engagedLambdas = stateManager.get('engagedLambdas');
 
   if (engagedLambdas.includes(lambdaKey)) {
-    console.log('Another request is being processed. Waiting...');
+    // console.log('Another request is being processed. Waiting...');
     return setTimeout(() => invokeWarmLambdaAndDecrementRedis(req, res, lambdaKey, targetLambda, stateManager, lambdaAverageExecutionTime, redisKey), 10);
   }
 
@@ -45,19 +45,21 @@ async function invokeWarmLambdaAndDecrementRedis(req, res, lambdaKey, targetLamb
   }
 }
 
-async function invokeLambda(req, stateManager, lambdaKey, minLambdaValue, res) {
+async function invokeLambda(req, stateManager, lambdaKey, minLambdaValue, res, routerState) {
   const targetLambda = minLambdaValue.targetLambda;
   // const engagedLambdas = stateManager.get('engagedLambdas');
   const redisKey = stateManager.get('redisKey');
   const lambdaAverageExecutionTime = stateManager.get('lambdaAverageExecutionTime');
   await req.redisHandler.update(redisKey, lambdaKey, lambdaAverageExecutionTime);
+  stateManager.set('lockRead',false)
+
   logInfo(
     `From Lambda ${lambdaKey}, AverageTimeToCompleteExecution incremented by: ${lambdaAverageExecutionTime}
     and current AverageTimeToCompleteExecution is: ${minLambdaValue.AverageTimeToCompleteExecution + lambdaAverageExecutionTime}`
   );
   await invokeWarmLambdaAndDecrementRedis(req, res, lambdaKey, targetLambda, stateManager, lambdaAverageExecutionTime, redisKey)
 }
-async function callLambdaDirectAndUpdateRedis(req, res, redisKey, minLambdaValue){
+async function callLambdaDirectAndUpdateRedis(req, res, redisKey, minLambdaValue, lambdaNode){
   const targetLambda = minLambdaValue.targetLambda;
   const lambdaResponse = await invokeLambdaFunctionWithQueryParams(targetLambda, req.query, req.body);
   console.log(`Lambda invoked and responded: ${JSON.stringify(lambdaResponse)}`);
