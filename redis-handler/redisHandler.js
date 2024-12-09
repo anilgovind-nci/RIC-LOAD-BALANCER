@@ -131,8 +131,8 @@ class RedisHandler {
             delete currentData.ActiveLambdas[lambdaKey]
             await this.create(key, currentData);
             console.log("from inside of deleting the lambda", await this.read(key))
-        }, 900000);//15 minute sleep
-      }, 600000); //10 minute sleep
+        }, 300000);//15 minute sleep
+      }, 180000); //10 minute sleep
     } catch (err) {
       console.error("Error during update:", err);
     }
@@ -143,8 +143,11 @@ class RedisHandler {
       const existingData = await this.read(key);
       if (existingData && existingData.ActiveLambdas[lambdaKey]) {
         // Modify the AverageTimeToCompleteExecution directly with the changeValue
-        existingData.ActiveLambdas[lambdaKey].AverageTimeToCompleteExecution += changeValue;
-
+        let newAverageTimeToCompleteExecution = existingData.ActiveLambdas[lambdaKey].AverageTimeToCompleteExecution + changeValue
+        if (newAverageTimeToCompleteExecution < 0){
+          newAverageTimeToCompleteExecution = 0
+        }
+        existingData.ActiveLambdas[lambdaKey].AverageTimeToCompleteExecution = newAverageTimeToCompleteExecution;
         // Save the updated data back to Redis
         await this.create(key, existingData);
         return existingData;
@@ -184,115 +187,115 @@ async function initializeRedisHandler() {
   return new RedisHandler(secretDetails);
 }
 
-(async () => {
-  console.log("Starting execution...");
-  try {
-    const storeData = {
-      ActiveLambdas: {
-        1: {
-          targetLambda: "ric-crud-application-dev-ricGet",
-          AverageTimeToCompleteExecution: 0,
-          isActive: true,
-        },
-        2: {
-          targetLambda: "ric-crud-application-dev-ricGet-6d888bfd-5f2f-4cb2-9fcb-6acbb842",
-          AverageTimeToCompleteExecution: 0,
-          isActive: true,
-        },
-      },
-      lambdaAverageColdStartTime: 20,
-      lambdaAverageExecutionTime: 150
-    }
-    const storeUpdatedData = {
-      ActiveLambdas: {},
-      lambdaAverageColdStartTime: 5000,
-      lambdaAverageExecutionTime: 1000
-    }
-    const getLambdaDetailskey = "deleteLambdaDetailskey"
-    const redisHandler = await initializeRedisHandler();
+// (async () => {
+//   console.log("Starting execution...");
+//   try {
+//     const storeData = {
+//       ActiveLambdas: {
+//         1: {
+//           targetLambda: "ric-crud-application-dev-ricGet",
+//           AverageTimeToCompleteExecution: 0,
+//           isActive: true,
+//         },
+//         2: {
+//           targetLambda: "ric-crud-application-dev-ricGet-6d888bfd-5f2f-4cb2-9fcb-6acbb842",
+//           AverageTimeToCompleteExecution: 0,
+//           isActive: true,
+//         },
+//       },
+//       lambdaAverageColdStartTime: 20,
+//       lambdaAverageExecutionTime: 150
+//     }
+//     const storeUpdatedData = {
+//       ActiveLambdas: {},
+//       lambdaAverageColdStartTime: 5000,
+//       lambdaAverageExecutionTime: 1000
+//     }
+//     const getLambdaDetailskey = "deleteLambdaDetailskey"
+//     const redisHandler = await initializeRedisHandler();
 
-    // await redisHandler.create("getLambdaDetailskey",storeUpdatedData)
-    console.log(await redisHandler.read("postLambdaDetailskey"))
+//     // await redisHandler.create("getLambdaDetailskey",storeUpdatedData)
+//     console.log(await redisHandler.read("postLambdaDetailskey"))
     
-    let data
-    // await redisHandler.read("deleteLambdaDetailskey")
-    // data = await redisHandler.read("deleteLambdaDetailskey")
-    // data.ActiveLambdas = {}
-    // console.log(data)
-    // await redisHandler.create("deleteLambdaDetailskey",data)
-    // console.log(await redisHandler.read("deleteLambdaDetailskey"))
+//     let data
+//     await redisHandler.read("deleteLambdaDetailskey")
+//     data = await redisHandler.read("deleteLambdaDetailskey")
+//     data.ActiveLambdas = {}
+//     console.log(data)
+//     await redisHandler.create("deleteLambdaDetailskey",data)
+//     console.log(await redisHandler.read("deleteLambdaDetailskey"))
 
 
-    // data = await redisHandler.read("getLambdaDetailskey")
-    // data.ActiveLambdas = {}
-    // console.log(data)
-    // await redisHandler.create("getLambdaDetailskey",data)
-    // console.log(await redisHandler.read("getLambdaDetailskey"))
+//     data = await redisHandler.read("getLambdaDetailskey")
+//     data.ActiveLambdas = {}
+//     console.log(data)
+//     await redisHandler.create("getLambdaDetailskey",data)
+//     console.log(await redisHandler.read("getLambdaDetailskey"))
 
-    // data = await redisHandler.read("putLambdaDetailskey")
-    // data.ActiveLambdas = {}
-    // console.log(data)
-    // await redisHandler.create("putLambdaDetailskey",data)
-    // console.log(await redisHandler.read("putLambdaDetailskey"))
+//     data = await redisHandler.read("putLambdaDetailskey")
+//     data.ActiveLambdas = {}
+//     console.log(data)
+//     await redisHandler.create("putLambdaDetailskey",data)
+//     console.log(await redisHandler.read("putLambdaDetailskey"))
 
-    // data = await redisHandler.read("postLambdaDetailskey")
-    // data.ActiveLambdas = {}
-    // console.log(data)
-    // await redisHandler.create("postLambdaDetailskey",data)
-    // console.log(await redisHandler.read("postLambdaDetailskey"))
+//     data = await redisHandler.read("postLambdaDetailskey")
+//     data.ActiveLambdas = {}
+//     console.log(data)
+//     await redisHandler.create("postLambdaDetailskey",data)
+//     console.log(await redisHandler.read("postLambdaDetailskey"))
 
-    // console.log(await redisHandler.read("deleteLambdaDetailskey"))
-    // console.log(await redisHandler.read("postLambdaDetailskey"))
-    // console.log(await redisHandler.read("putLambdaDetailskey"))
-    // console.log(await redisHandler.read("getLambdaDetailskey"))
-
-
-
-
-    // data.ActiveLambdas = {}
-    // console.log(data)
-    // await redisHandler.create(getLambdaDetailskey,data)
-    // console.log(await redisHandler.read(getLambdaDetailskey))
-
-
-    // console.log(await redisHandler.create(getLambdaDetailskey,data))
-    // await redisHandler.create(getLambdaDetailskey,storeData)
-    // await redisHandler.create(getLambdaDetailskey,storeUpdatedData);
-    // await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
-    // console.log(await redisHandler.read(getLambdaDetailskey))
+//     console.log(await redisHandler.read("deleteLambdaDetailskey"))
+//     console.log(await redisHandler.read("postLambdaDetailskey"))
+//     console.log(await redisHandler.read("putLambdaDetailskey"))
+//     console.log(await redisHandler.read("getLambdaDetailskey"))
 
 
 
-    // await redisHandler.create(getLambdaDetailskey, storeUpdatedData);
-    // let data = await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
-    // console.log(data)
-    // const newNode = {
-    //   targetLambda: "ric-crud-application-dev-ricGet",
-    //   AverageTimeToCompleteExecution: 0,
-    //   isActive: true,
-    // }
-    // const newKey = await redisHandler.addLambdaNode(getLambdaDetailskey, newNode)
-    // await redisHandler.removeLambdaNode(getLambdaDetailskey, newKey, newNode)
+
+//     // data.ActiveLambdas = {}
+//     // console.log(data)
+//     // await redisHandler.create(getLambdaDetailskey,data)
+//     // console.log(await redisHandler.read(getLambdaDetailskey))
+
+
+//     // console.log(await redisHandler.create(getLambdaDetailskey,data))
+//     // await redisHandler.create(getLambdaDetailskey,storeData)
+//     // await redisHandler.create(getLambdaDetailskey,storeUpdatedData);
+//     // await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
+//     // console.log(await redisHandler.read(getLambdaDetailskey))
 
 
 
-    // setTimeout(async () => {
-    //   console.log("adding new node 1")
-    //   const newKey = await redisHandler.addLambdaNode(getLambdaDetailskey, newNode)
-    // await redisHandler.removeLambdaNode(getLambdaDetailskey, newKey, newNode)
-    // }, 10000)
-    // setTimeout(async () => {
-    //   console.log("adding new node 2")
-    //   const newKey = await redisHandler.addLambdaNode(getLambdaDetailskey, newNode)
-    //   await redisHandler.removeLambdaNode(getLambdaDetailskey, newKey, newNode)
-    // }, 20000)
-    //     // await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
-    //     // await redisHandler.delete(getLambdaDetailskey); 
-    //     // await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
-    // redisHandler.disconnect(); // Disconnect after operation is complete
-  } catch (error) {
-    console.error("Error during execution:", error);
-  }
-  // process.exit(0); // Ensure the script exits after execution
-})();
+//     // await redisHandler.create(getLambdaDetailskey, storeUpdatedData);
+//     // let data = await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
+//     // console.log(data)
+//     // const newNode = {
+//     //   targetLambda: "ric-crud-application-dev-ricGet",
+//     //   AverageTimeToCompleteExecution: 0,
+//     //   isActive: true,
+//     // }
+//     // const newKey = await redisHandler.addLambdaNode(getLambdaDetailskey, newNode)
+//     // await redisHandler.removeLambdaNode(getLambdaDetailskey, newKey, newNode)
+
+
+
+//     // setTimeout(async () => {
+//     //   console.log("adding new node 1")
+//     //   const newKey = await redisHandler.addLambdaNode(getLambdaDetailskey, newNode)
+//     // await redisHandler.removeLambdaNode(getLambdaDetailskey, newKey, newNode)
+//     // }, 10000)
+//     // setTimeout(async () => {
+//     //   console.log("adding new node 2")
+//     //   const newKey = await redisHandler.addLambdaNode(getLambdaDetailskey, newNode)
+//     //   await redisHandler.removeLambdaNode(getLambdaDetailskey, newKey, newNode)
+//     // }, 20000)
+//     //     // await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
+//     //     // await redisHandler.delete(getLambdaDetailskey); 
+//     //     // await redisHandler.read(getLambdaDetailskey); // Wait for the read to complete
+//     // redisHandler.disconnect(); // Disconnect after operation is complete
+//   } catch (error) {
+//     console.error("Error during execution:", error);
+//   }
+//   // process.exit(0); // Ensure the script exits after execution
+// })();
 module.exports = { initializeRedisHandler }; // Ensure correct export
