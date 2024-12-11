@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+//import all the routing code blocks
 const getRouter = require("./GET/rout-get-requests");
 const postRouter = require("./POST/rout-post-requests");
 const putRouter = require("./PUT/rout-put-requests");
@@ -8,7 +9,7 @@ const deleteRouter = require("./DELETE/rout-delete-requests");
 
 
 
-
+// route requests to respective path
 router.get("/", (req, res) => {
     return (getRouter(req, res));
 });

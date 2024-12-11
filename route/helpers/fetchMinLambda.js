@@ -1,3 +1,4 @@
+//function for fetching minimum load node from redis returned active lambdas
 function getLambdaWithMinExecutionTime(lambdas) {
     return lambdas.reduce((min, current) => {
       const [, currentValue] = current;
@@ -5,7 +6,7 @@ function getLambdaWithMinExecutionTime(lambdas) {
       return currentValue.AverageTimeToCompleteExecution < minValue.AverageTimeToCompleteExecution
         ? current
         : min;
-    }, lambdas[0]); // Set the initial value for reduce
+    }, lambdas[0]);
   }
 
 module.exports = { getLambdaWithMinExecutionTime };

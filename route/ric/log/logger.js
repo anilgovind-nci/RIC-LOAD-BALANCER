@@ -1,3 +1,5 @@
+
+// logger functions to add logs to file
 const fs = require('fs');
 const path = require('path');
 

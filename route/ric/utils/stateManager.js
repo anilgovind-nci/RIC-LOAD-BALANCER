@@ -1,3 +1,4 @@
+// The statemanger will work as a local registry and shared between every requests.
 class StateManager {
     constructor(initialState) {
       this.state = { ...initialState };
@@ -18,6 +19,7 @@ class StateManager {
     }
   }
   
+  //post function record
   const postRouterState = new StateManager({
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
@@ -26,7 +28,8 @@ class StateManager {
     secretManagerKey: 'postFunctionResourcesRediskey',
     lockRead:false,
   });
-  
+
+  //post function record
   const getRouterState = new StateManager({
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
@@ -35,6 +38,8 @@ class StateManager {
     secretManagerKey: 'getFunctionResourcesRediskey',
     lockRead:false,
   });
+
+  //post function record
   const putRouterState = new StateManager({
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
@@ -44,6 +49,7 @@ class StateManager {
     lockRead:false,
   });
 
+  //post function record
   const deleteRouterState = new StateManager({
     firstRequest: true,
     lambdaAverageExecutionTime: 0,
