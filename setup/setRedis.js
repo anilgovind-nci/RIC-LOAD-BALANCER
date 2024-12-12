@@ -16,7 +16,6 @@ const { initializeRedisHandler } = require("../redis-handler/redisHandler");
         lambdaAverageColdStartTime: 5000,
         lambdaAverageExecutionTime: 1000
       }
-
       await redisHandler.create("deleteLambdaDetailskey",storeData)
       await redisHandler.create("getLambdaDetailskey",storeData)
       await redisHandler.create("putLambdaDetailskey",storeData)
